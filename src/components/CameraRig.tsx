@@ -31,21 +31,46 @@ export function CameraRig({ focus, hoverZoom }: CameraRigProps) {
         }
       }
     } else if (focus) {
-      // Click focus - normal speed
+      // Click focus - normal speed (faster for detail view)
       const targetPos = new THREE.Vector3(...focus.pos);
       const targetLookAt = new THREE.Vector3(...focus.target);
       const distance = camera.position.distanceTo(targetPos);
+      const lerpSpeed = focus.isDetailView ? 0.04 : 0.08;
 
       if (distance > 0.05) {
-        camera.position.lerp(targetPos, 0.06);
+        camera.position.lerp(targetPos, lerpSpeed);
         if (controlsRef.current) {
-          controlsRef.current.target.lerp(targetLookAt, 0.06);
+          controlsRef.current.target.lerp(targetLookAt, lerpSpeed);
+        }
+        // In detail view, smoothly rotate camera toward target
+        if (focus.isDetailView) {
+          const matrix = new THREE.Matrix4().lookAt(
+            targetPos,
+            targetLookAt,
+            camera.up,
+          );
+          const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+            matrix,
+          );
+          camera.quaternion.slerp(targetQuaternion, lerpSpeed * 1.2);
         }
       } else {
         // Snap to final position to prevent bounce
         camera.position.copy(targetPos);
         if (controlsRef.current) {
           controlsRef.current.target.copy(targetLookAt);
+        }
+        // In detail view, smoothly rotate camera toward target
+        if (focus.isDetailView) {
+          const matrix = new THREE.Matrix4().lookAt(
+            targetPos,
+            targetLookAt,
+            camera.up,
+          );
+          const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+            matrix,
+          );
+          camera.quaternion.slerp(targetQuaternion, 0.1);
         }
       }
     }
@@ -62,6 +87,7 @@ export function CameraRig({ focus, hoverZoom }: CameraRigProps) {
       maxDistance={30}
       maxPolarAngle={Math.PI / 2.1}
       makeDefault
+      enabled={!focus?.isDetailView}
     />
   );
 }

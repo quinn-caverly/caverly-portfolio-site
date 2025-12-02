@@ -1,9 +1,14 @@
+import { useState } from "react";
+
 interface HeaderProps {
   isDayMode: boolean;
   setIsDayMode: (value: boolean) => void;
 }
 
 export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [isNameHovered, setIsNameHovered] = useState(false);
+
   const socialLinks = [
     {
       id: "github",
@@ -14,6 +19,7 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
         </svg>
       ),
       label: "GitHub",
+      text: "github.com/quinn-caverly",
     },
     {
       id: "linkedin",
@@ -24,6 +30,7 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
         </svg>
       ),
       label: "LinkedIn",
+      text: "linkedin.com/in/quinn-caverly",
     },
     {
       id: "email",
@@ -34,6 +41,7 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
         </svg>
       ),
       label: "Email",
+      text: "quinncaverly@gmail.com",
     },
     {
       id: "phone",
@@ -44,6 +52,7 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
         </svg>
       ),
       label: "Phone",
+      text: "(443) 835-0810",
     },
   ];
 
@@ -73,56 +82,103 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
         />
       </div>
 
-      <div className="max-w-full mx-auto px-6 py-5 flex items-center justify-between relative z-10">
-        {/* Left: Emoji + Name */}
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">😎</span>
+      <div className="max-w-full mx-auto px-8 py-5 flex items-center justify-between relative z-10">
+        {/* Left: Name (emoji appears on hover) */}
+        <div
+          className="flex items-center gap-3 pl-4 cursor-pointer"
+          style={{ height: "32px" }}
+          onMouseEnter={() => setIsNameHovered(true)}
+          onMouseLeave={() => setIsNameHovered(false)}
+        >
           <h1
-            className="m-0 text-2xl font-bold tracking-wide whitespace-nowrap transition-colors duration-300"
-            style={{ color: isDayMode ? "#111827" : "#f9fafb" }}
+            className="m-0 font-bold tracking-wide whitespace-nowrap transition-all duration-300"
+            style={{
+              color: isDayMode ? "#111827" : "#f9fafb",
+              fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+            }}
           >
             Quinn Caverly
           </h1>
+          <span
+            className="text-2xl transition-all duration-300"
+            style={{
+              opacity: isNameHovered ? 1 : 0,
+              maxWidth: isNameHovered ? "40px" : "0px",
+              overflow: "hidden",
+            }}
+          >
+            😎
+          </span>
         </div>
 
         {/* Center: Social Icons */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-6">
-          {socialLinks.map((link) => (
-            <a
-              key={link.id}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-all duration-200 hover:scale-110 hover:opacity-100"
-              style={{
-                color: isDayMode ? "#6b7280" : "#9ca3af",
-                opacity: 0.85,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = isDayMode ? "#111827" : "#f9fafb";
-                e.currentTarget.style.opacity = "1";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = isDayMode ? "#6b7280" : "#9ca3af";
-                e.currentTarget.style.opacity = "0.85";
-              }}
-              aria-label={link.label}
-              title={link.label}
-            >
-              {link.icon}
-            </a>
-          ))}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ width: "800px", height: "30px" }}
+        >
+          {socialLinks.map((link, index) => {
+            const isHovered = hoveredLink === link.id;
+            const spacing = [0, 240, 500, 700]; // Fixed positions for each icon with text space
+            return (
+              <div
+                key={link.id}
+                className="absolute"
+                style={{
+                  left: `${spacing[index]}px`,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-all duration-200 hover:scale-110 hover:opacity-100 flex items-center gap-2 whitespace-nowrap"
+                  style={{
+                    color: isDayMode ? "#6b7280" : "#9ca3af",
+                    opacity: 0.85,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = isDayMode
+                      ? "#111827"
+                      : "#f9fafb";
+                    e.currentTarget.style.opacity = "1";
+                    setHoveredLink(link.id);
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = isDayMode
+                      ? "#6b7280"
+                      : "#9ca3af";
+                    e.currentTarget.style.opacity = "0.85";
+                    setHoveredLink(null);
+                  }}
+                  aria-label={link.label}
+                  title={link.label}
+                >
+                  <span className="shrink-0">{link.icon}</span>
+                  <span
+                    className="text-sm font-medium transition-all duration-200"
+                    style={{
+                      opacity: isHovered ? 1 : 0,
+                    }}
+                  >
+                    {link.text}
+                  </span>
+                </a>
+              </div>
+            );
+          })}
         </div>
 
         {/* Right: Toggle Checkbox */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pr-4">
           <span
             className="text-sm font-medium transition-colors duration-300"
             style={{ color: isDayMode ? "#6b7280" : "#9ca3af" }}
           >
             {isDayMode ? "Light" : "Dark"}
           </span>
-          <label className="relative inline-block w-14 h-7 cursor-pointer">
+          <label className="relative inline-block w-12 h-7 cursor-pointer">
             <input
               type="checkbox"
               checked={isDayMode}
@@ -141,9 +197,9 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
               }}
             />
             <div
-              className="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-md peer-checked:translate-x-7"
+              className="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-md"
               style={{
-                transform: isDayMode ? "translateX(28px)" : "translateX(0)",
+                transform: isDayMode ? "translateX(20px)" : "translateX(0)",
               }}
             />
           </label>

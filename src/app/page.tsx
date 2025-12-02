@@ -9,7 +9,10 @@ import Hero from "@/components/Hero";
 // Dynamically import MapScene with no SSR to prevent hydration errors
 const MapScene = dynamic(
   () => import("@/components/MapScene").then((mod) => mod.MapScene),
-  { ssr: false },
+  {
+    ssr: false,
+    loading: () => null,
+  },
 );
 
 export default function Home() {
@@ -17,9 +20,15 @@ export default function Home() {
   const [isDayMode, setIsDayMode] = useState(false);
 
   return (
-    <>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: isDayMode ? "#87CEEB" : "#0a0a1a",
+      }}
+    >
       <Header isDayMode={isDayMode} setIsDayMode={setIsDayMode} />
       <MapScene focus={focus} setFocus={setFocus} isDayMode={isDayMode} />
-    </>
+    </div>
   );
 }
