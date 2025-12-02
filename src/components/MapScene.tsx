@@ -281,7 +281,11 @@ export function MapScene({ focus, setFocus, isDayMode }: MapSceneProps) {
         />
       )}
 
-      <ProjectPanel projectName={selectedProject} onClose={handleCloseDetail} />
+      <ProjectPanel
+        projectName={selectedProject}
+        onClose={handleCloseDetail}
+        isDayMode={isDayMode}
+      />
     </>
   );
 }
