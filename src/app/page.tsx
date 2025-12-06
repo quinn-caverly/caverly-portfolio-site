@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
@@ -19,7 +19,7 @@ const MapScene = dynamic(
   },
 );
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const [focus, setFocus] = useState<FocusState | null>(null);
   const [isDayMode, setIsDayMode] = useState(false);
@@ -113,5 +113,13 @@ export default function Home() {
       />
       <WelcomeTooltip isDayMode={isDayMode} />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }
