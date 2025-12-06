@@ -216,6 +216,8 @@ export function MarkerOverlays({
             const isHovered = effectiveHoveredMarker === marker.name;
             const shouldHide = effectiveHoveredMarker !== null && !isHovered;
 
+            const isRedTeam = marker.team === "red";
+
             return (
               <div
                 key={marker.name}
@@ -417,7 +419,7 @@ export function MarkerOverlays({
                           style={{
                             fontSize: "12px",
                             fontWeight: "600",
-                            color: "#667eea",
+                            color: isRedTeam ? "#e24a4a" : "#667eea",
                             textAlign: "left",
                           }}
                         >

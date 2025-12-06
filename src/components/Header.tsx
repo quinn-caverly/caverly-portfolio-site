@@ -5,6 +5,8 @@ interface HeaderProps {
   setIsDayMode: (value: boolean) => void;
   selectedProject?: string | null;
   onHomeClick?: () => void;
+  isFallbackMode?: boolean;
+  isMobile?: boolean;
 }
 
 export function Header({
@@ -12,6 +14,8 @@ export function Header({
   setIsDayMode,
   selectedProject,
   onHomeClick,
+  isFallbackMode = false,
+  isMobile = false,
 }: HeaderProps) {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [isNameHovered, setIsNameHovered] = useState(false);
@@ -73,26 +77,39 @@ export function Header({
   ];
 
   // Determine if project is on left (blue team) or right (red team)
-  const isProjectOnLeft =
-    selectedProject?.startsWith("Blue") || selectedProject === "AboutMe";
+  const isProjectOnLeft = selectedProject?.startsWith("Blue");
   const isProjectOnRight = selectedProject?.startsWith("Red");
+  const isAboutMe = selectedProject === "AboutMe";
+
+  // Hide header in fallback mode when a project is selected
+  if (isFallbackMode && selectedProject) {
+    return null;
+  }
 
   return (
     <header
       className="fixed top-6 z-[1000] transition-all duration-500 ease-out"
       style={{
-        left: selectedProject
-          ? isProjectOnLeft
-            ? "calc(40vw + 24px)"
-            : "24px"
-          : "50%",
-        transform: selectedProject
-          ? scrolled
-            ? "translateY(-2px)"
-            : "translateY(0)"
-          : `translateX(-50%) ${scrolled ? "translateY(-2px)" : "translateY(0)"}`,
-        width: selectedProject ? "calc(60vw - 48px)" : "calc(100% - 48px)",
-        maxWidth: selectedProject ? "none" : "1400px",
+        left: isAboutMe
+          ? "50%"
+          : selectedProject
+            ? isProjectOnLeft
+              ? "calc(40% + 24px)"
+              : "24px"
+            : "50%",
+        transform: isAboutMe
+          ? `translateX(-50%) ${scrolled ? "translateY(-2px)" : "translateY(0)"}`
+          : selectedProject
+            ? scrolled
+              ? "translateY(-2px)"
+              : "translateY(0)"
+            : `translateX(-50%) ${scrolled ? "translateY(-2px)" : "translateY(0)"}`,
+        width: isAboutMe
+          ? "calc(100% - 48px)"
+          : selectedProject
+            ? "calc(60% - 48px)"
+            : "calc(100% - 48px)",
+        maxWidth: isAboutMe ? "1400px" : selectedProject ? "none" : "1400px",
       }}
     >
       <div
@@ -147,49 +164,51 @@ export function Header({
         >
           {/* Left: Home icon and Name with gradient effect */}
           <div className="flex items-center gap-4">
-            {/* Home icon - always visible, more prominent when project is selected */}
-            <button
-              onClick={onHomeClick}
-              className="flex items-center justify-center transition-all duration-300 hover:scale-110"
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "12px",
-                backgroundColor: selectedProject
-                  ? isDayMode
-                    ? "rgba(102, 126, 234, 0.15)"
-                    : "rgba(167, 139, 250, 0.2)"
-                  : isDayMode
-                    ? "rgba(102, 126, 234, 0.08)"
-                    : "rgba(255, 255, 255, 0.05)",
-                border: "none",
-                cursor: "pointer",
-                color: selectedProject
-                  ? isDayMode
-                    ? "#667eea"
-                    : "#a78bfa"
-                  : isDayMode
-                    ? "#667eea"
-                    : "#6b7280",
-                opacity: selectedProject ? 1 : 0.6,
-              }}
-              aria-label="Home"
-              title="Back to Home"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {/* Home icon - hide in fallback mode */}
+            {!isFallbackMode && (
+              <button
+                onClick={onHomeClick}
+                className="flex items-center justify-center transition-all duration-300 hover:scale-110"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "12px",
+                  backgroundColor: selectedProject
+                    ? isDayMode
+                      ? "rgba(102, 126, 234, 0.15)"
+                      : "rgba(167, 139, 250, 0.2)"
+                    : isDayMode
+                      ? "rgba(102, 126, 234, 0.08)"
+                      : "rgba(255, 255, 255, 0.05)",
+                  border: "none",
+                  cursor: "pointer",
+                  color: selectedProject
+                    ? isDayMode
+                      ? "#667eea"
+                      : "#a78bfa"
+                    : isDayMode
+                      ? "#667eea"
+                      : "#6b7280",
+                  opacity: selectedProject ? 1 : 0.6,
+                }}
+                aria-label="Home"
+                title="Back to Home"
               >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-            </button>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+              </button>
+            )}
 
             <div
               className="flex items-center gap-3 cursor-pointer"
@@ -203,7 +222,11 @@ export function Header({
                   className="m-0 font-bold tracking-wide whitespace-nowrap"
                   style={{
                     position: isDayMode ? "relative" : "absolute",
-                    fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+                    fontSize: isMobile
+                      ? "1.125rem"
+                      : isNameHovered
+                        ? "1.75rem"
+                        : "1.5rem",
                     background:
                       "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                     WebkitBackgroundClip: "text",
@@ -223,7 +246,11 @@ export function Header({
                     position: isDayMode ? "absolute" : "relative",
                     top: 0,
                     left: 0,
-                    fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+                    fontSize: isMobile
+                      ? "1.125rem"
+                      : isNameHovered
+                        ? "1.75rem"
+                        : "1.5rem",
                     background:
                       "linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)",
                     WebkitBackgroundClip: "text",
@@ -256,7 +283,11 @@ export function Header({
           {/* Center: Social Icons with Dropdown */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{ display: "flex", gap: "8px", alignItems: "center" }}
+            style={{
+              display: "flex",
+              gap: isMobile ? "4px" : "8px",
+              alignItems: "center",
+            }}
           >
             {socialLinks.map((link) => {
               const isHovered = hoveredLink === link.id;
@@ -273,8 +304,8 @@ export function Header({
                     rel="noopener noreferrer"
                     className="flex items-center justify-center transition-all duration-300"
                     style={{
-                      width: "44px",
-                      height: "44px",
+                      width: isMobile ? "36px" : "44px",
+                      height: isMobile ? "36px" : "44px",
                       borderRadius: "12px",
                       color: isHovered
                         ? isDayMode

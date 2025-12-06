@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
 import { FocusState } from "@/types";
-import { AnimatedBackground } from "@/components/AnimatedBackground";
-import Iridescence from "@/components/Iridescence";
+import { BackgroundLayer } from "@/components/BackgroundLayer";
 import { FallbackView } from "@/components/FallbackView";
 import { ProjectPanel } from "@/components/ProjectPanel";
+import { WelcomeTooltip } from "@/components/WelcomeTooltip";
 
 // Dynamically import MapScene with no SSR to prevent hydration errors
 const MapScene = dynamic(
@@ -19,18 +20,27 @@ const MapScene = dynamic(
 );
 
 export default function Home() {
+  const searchParams = useSearchParams();
   const [focus, setFocus] = useState<FocusState | null>(null);
   const [isDayMode, setIsDayMode] = useState(false);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [hasThreeJsError, setHasThreeJsError] = useState(false);
-  const [simulateError, setSimulateError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Check for simulate-error parameter using useMemo to avoid hydration issues
+  const shouldSimulateError = useMemo(() => {
+    return searchParams.get("simulate-error") === "true";
+  }, [searchParams]);
+
+  // Detect mobile/small screens
   useEffect(() => {
-    // Check URL for ?simulate-error=true to test fallback
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("simulate-error") === "true") {
-      setSimulateError(true);
-    }
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || window.innerHeight < 600);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const handleHomeClick = () => {
@@ -46,8 +56,8 @@ export default function Home() {
     setSelectedProject(projectName);
   };
 
-  // Show fallback if error or simulating error
-  if (hasThreeJsError || simulateError) {
+  // Show fallback if error, simulating error, or mobile device
+  if (hasThreeJsError || shouldSimulateError || isMobile) {
     return (
       <div
         style={{
@@ -55,52 +65,19 @@ export default function Home() {
           inset: 0,
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: isDayMode ? 1 : 0,
-            transition: "opacity 0.6s ease-in-out",
-            pointerEvents: isDayMode ? "auto" : "none",
-          }}
-        >
-          <Iridescence
-            color={[1, 1, 1]}
-            mouseReact={false}
-            amplitude={0.1}
-            speed={1.0}
-          />
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: isDayMode ? 0 : 1,
-            transition: "opacity 0.6s ease-in-out",
-            pointerEvents: isDayMode ? "none" : "auto",
-          }}
-        >
-          <AnimatedBackground
-            isDayMode={isDayMode}
-            density={1.2}
-            glowIntensity={0.4}
-            saturation={0.3}
-            hueShift={260}
-            mouseRepulsion={true}
-            mouseInteraction={true}
-            twinkleIntensity={0.4}
-            rotationSpeed={0.02}
-          />
-        </div>
+        <BackgroundLayer isDayMode={isDayMode} />
         <Header
           isDayMode={isDayMode}
           setIsDayMode={setIsDayMode}
-          selectedProject={null}
+          selectedProject={selectedProject}
           onHomeClick={handleHomeClick}
+          isFallbackMode={true}
+          isMobile={isMobile}
         />
         <FallbackView
           isDayMode={isDayMode}
           onProjectClick={handleProjectClick}
+          isMobile={isMobile}
         />
         <ProjectPanel
           projectName={selectedProject}
@@ -119,43 +96,7 @@ export default function Home() {
         inset: 0,
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: isDayMode ? 1 : 0,
-          transition: "opacity 0.6s ease-in-out",
-          pointerEvents: isDayMode ? "auto" : "none",
-        }}
-      >
-        <Iridescence
-          color={[1, 1, 1]}
-          mouseReact={false}
-          amplitude={0.1}
-          speed={1.0}
-        />
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: isDayMode ? 0 : 1,
-          transition: "opacity 0.6s ease-in-out",
-          pointerEvents: isDayMode ? "none" : "auto",
-        }}
-      >
-        <AnimatedBackground
-          isDayMode={isDayMode}
-          density={1.2}
-          glowIntensity={0.4}
-          saturation={0.3}
-          hueShift={260}
-          mouseRepulsion={true}
-          mouseInteraction={true}
-          twinkleIntensity={0.4}
-          rotationSpeed={0.02}
-        />
-      </div>
+      <BackgroundLayer isDayMode={isDayMode} />
       <Header
         isDayMode={isDayMode}
         setIsDayMode={setIsDayMode}
@@ -170,6 +111,7 @@ export default function Home() {
         setSelectedProject={setSelectedProject}
         onError={() => setHasThreeJsError(true)}
       />
+      <WelcomeTooltip isDayMode={isDayMode} />
     </div>
   );
 }

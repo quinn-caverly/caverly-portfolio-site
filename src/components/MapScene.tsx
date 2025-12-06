@@ -6,6 +6,7 @@ import { Stars } from "@react-three/drei";
 import { ShootingStars } from "./ShootingStars";
 import { MarkerOverlays } from "./MarkerOverlays";
 import { ProjectPanel } from "./ProjectPanel";
+import { HomeButton } from "./HomeButton";
 import { Suspense, useState, useEffect, memo, useRef } from "react";
 import * as THREE from "three";
 
@@ -173,11 +174,12 @@ export function MapScene({
       isDetailView: false,
     });
 
-    // Wait for camera to finish animation before showing cards
-    // Show cards when camera is ~50% back (at 0.12 lerp speed)
+    // Wait for camera to finish animation before showing cards and clearing focus
     resetTimeoutRef.current = setTimeout(() => {
       setIsResetting(false);
-    }, 400);
+      // Clear focus to allow free user exploration
+      setFocus(null);
+    }, 800);
   };
 
   const handleHoverZoom = () => {
@@ -301,6 +303,14 @@ export function MapScene({
         projectName={selectedProject}
         onClose={handleCloseDetail}
         isDayMode={isDayMode}
+      />
+
+      <HomeButton
+        camera={camera}
+        canvasSize={canvasSize}
+        onHomeClick={handleCloseDetail}
+        isDayMode={isDayMode}
+        selectedProject={selectedProject}
       />
     </>
   );

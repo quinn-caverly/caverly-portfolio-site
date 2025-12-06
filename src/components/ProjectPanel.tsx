@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { PROJECTS } from "@/constants/projects";
 
 interface ProjectPanelProps {
   projectName: string | null;
@@ -176,6 +177,7 @@ export function ProjectPanel({
   projectName,
   onClose,
   isDayMode,
+  isFallbackMode = false,
 }: ProjectPanelProps) {
   const isOpen = projectName !== null;
   const project = projectName ? projectData[projectName] : null;
@@ -217,34 +219,52 @@ export function ProjectPanel({
       <div
         style={{
           position: "fixed",
-          ...(isAboutMe
-            ? { bottom: 0, left: 0, right: 0, height: "40vh" }
-            : {
-                top: 0,
-                ...(project.team === "blue" ? { left: 0 } : { right: 0 }),
-                bottom: 0,
-                width: "40vw",
-              }),
+          ...(isFallbackMode
+            ? {
+                top: "24px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "calc(100% - 48px)",
+                maxWidth: "800px",
+                maxHeight: "calc(100vh - 48px)",
+              }
+            : isAboutMe
+              ? {
+                  bottom: "24px",
+                  left: "24px",
+                  right: "24px",
+                  height: "calc(40vh - 24px)",
+                  maxHeight: "600px",
+                }
+              : {
+                  top: "24px",
+                  ...(project.team === "blue"
+                    ? { left: "24px" }
+                    : { right: "24px" }),
+                  bottom: "24px",
+                  width: "calc(40% - 48px)",
+                }),
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           background: isDayMode
-            ? "rgba(255, 255, 255, 0.75)"
-            : "rgba(15, 15, 26, 0.75)",
+            ? "rgba(255, 255, 255, 0.95)"
+            : "rgba(15, 15, 26, 0.95)",
           border: isDayMode
             ? "1px solid rgba(255, 255, 255, 0.5)"
             : "1px solid rgba(255, 255, 255, 0.1)",
-          boxShadow: isAboutMe
-            ? "0 -4px 24px rgba(0, 0, 0, 0.5)"
-            : project.team === "blue"
-              ? "4px 0 24px rgba(0, 0, 0, 0.5)"
-              : "-4px 0 24px rgba(0, 0, 0, 0.5)",
+          borderRadius: "16px",
+          boxShadow: isDayMode
+            ? "0 10px 40px rgba(0, 0, 0, 0.15)"
+            : "0 10px 40px rgba(0, 0, 0, 0.5)",
           zIndex: 1000,
           overflowY: "auto",
-          animation: isAboutMe
-            ? "slideInBottom 0.3s ease"
-            : project.team === "blue"
-              ? "slideInLeft 0.3s ease"
-              : "slideIn 0.3s ease",
+          animation: isFallbackMode
+            ? "fadeIn 0.3s ease"
+            : isAboutMe
+              ? "slideInBottom 0.3s ease"
+              : project.team === "blue"
+                ? "slideInLeft 0.3s ease"
+                : "slideIn 0.3s ease",
           display: "flex",
           flexDirection: "column",
         }}

@@ -31,13 +31,16 @@ export function CameraRig({ focus, hoverZoom }: CameraRigProps) {
         }
       }
     } else if (focus) {
-      // Click focus - normal speed (faster for detail view)
+      // Animate to target position
       const targetPos = new THREE.Vector3(...focus.pos);
       const targetLookAt = new THREE.Vector3(...focus.target);
       const distance = camera.position.distanceTo(targetPos);
+      const targetDistance =
+        controlsRef.current?.target.distanceTo(targetLookAt) || 0;
       const lerpSpeed = focus.isDetailView ? 0.04 : 0.08;
 
-      if (distance > 0.05) {
+      // Only animate if we're not close enough yet
+      if (distance > 0.05 || targetDistance > 0.05) {
         camera.position.lerp(targetPos, lerpSpeed);
         if (controlsRef.current) {
           controlsRef.current.target.lerp(targetLookAt, lerpSpeed);
@@ -54,24 +57,6 @@ export function CameraRig({ focus, hoverZoom }: CameraRigProps) {
           );
           camera.quaternion.slerp(targetQuaternion, lerpSpeed * 1.2);
         }
-      } else {
-        // Snap to final position to prevent bounce
-        camera.position.copy(targetPos);
-        if (controlsRef.current) {
-          controlsRef.current.target.copy(targetLookAt);
-        }
-        // In detail view, smoothly rotate camera toward target
-        if (focus.isDetailView) {
-          const matrix = new THREE.Matrix4().lookAt(
-            targetPos,
-            targetLookAt,
-            camera.up,
-          );
-          const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(
-            matrix,
-          );
-          camera.quaternion.slerp(targetQuaternion, 0.1);
-        }
       }
     }
   });
@@ -79,8 +64,9 @@ export function CameraRig({ focus, hoverZoom }: CameraRigProps) {
   return (
     <OrbitControls
       ref={controlsRef}
-      enablePan={false}
-      enableDamping={false}
+      enablePan={true}
+      enableDamping={true}
+      dampingFactor={0.05}
       rotateSpeed={0.5}
       zoomSpeed={0.8}
       minDistance={5}

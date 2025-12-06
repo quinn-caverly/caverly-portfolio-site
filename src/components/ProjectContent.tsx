@@ -1,125 +1,21 @@
 import { ReactNode } from "react";
+import { PROJECTS } from "@/constants/projects";
 
 interface ProjectContentProps {
   projectName: string;
   isDayMode: boolean;
   onClose: () => void;
   children?: ReactNode;
+  layoutMode?: "left" | "right" | "center";
 }
-
-const projectData: Record<
-  string,
-  {
-    title: string;
-    description: string;
-    emoji: string;
-    techStack: string[];
-    githubUrl?: string;
-    liveUrl?: string;
-    team: "blue" | "red";
-    youtubeVideos?: string[];
-    youtubeStats?: string;
-    analyticsImage?: string;
-    repoCount?: number;
-    previewImage?: string;
-    flowchartImages?: string[];
-    screenshotImages?: string[];
-  }
-> = {
-  BlueCapital: {
-    title: "Mods for YouTube",
-    description:
-      "Created custom Minecraft mods in Java for YouTube videos averaging 20,000+ views. Applied OOP and design patterns to build custom entities, gameplay mechanics, and data systems.",
-    emoji: "🎮",
-    techStack: ["Java", "Object-Oriented Design"],
-    githubUrl: "https://github.com/orgs/knavishmantis/repositories",
-    liveUrl: "https://www.youtube.com/@knavishmantis/shorts",
-    team: "blue",
-    youtubeVideos: [
-      "https://www.youtube.com/embed/KKKAMrBoQw4",
-      "https://www.youtube.com/embed/hOBiq9WKg7Q",
-    ],
-    youtubeStats: "250K+ Monthly Views",
-    analyticsImage: "/images/knavishmantis/knavishmantis-analytics.png",
-    repoCount: 10,
-  },
-  BlueLakeOutpost: {
-    title: "Formula Viz",
-    description:
-      "End-to-end automated F1 visualization pipeline. Takes driver names, track name, and year as input, fetches telemetry data from FastF1 API, constructs 3D track layouts, renders cinematically animated qualifying sessions in Blender, and automatically publishes the final videos to YouTube via GitHub Actions.",
-    emoji: "🏎️",
-    techStack: ["Python", "Blender", "FastF1 API", "GitHub Actions"],
-    githubUrl: "https://github.com/quinn-caverly/f1-telemetry-visualization",
-    liveUrl: "https://f1dataviz.com",
-    team: "blue",
-    youtubeVideos: [
-      "https://www.youtube.com/embed/example1",
-      "https://www.youtube.com/embed/example2",
-    ],
-    previewImage: "/images/f1dataviz/f1-preview.png",
-  },
-  BluePlainsOutpost: {
-    title: "Learn Rust",
-    description:
-      "Interactive web application for learning Rust programming. Features hands-on coding exercises, real-time feedback, and a progression system to guide learners from basics to advanced concepts.",
-    emoji: "🦀",
-    techStack: ["React", "TypeScript", "Rust WASM"],
-    githubUrl: "https://github.com/quinn-caverly/learn-rust",
-    liveUrl: "https://learnrust.dev",
-    team: "blue",
-    previewImage: "/images/learnrust/preview.png",
-  },
-  RedCapital: {
-    title: "SwiftQuiz",
-    description:
-      "Native iOS quiz application built with Swift and SwiftUI. Features include timed challenges, score tracking, category selection, and smooth animations for an engaging user experience.",
-    emoji: "📱",
-    techStack: ["Swift", "SwiftUI", "Core Data"],
-    githubUrl: "https://github.com/quinn-caverly/swiftquiz",
-    liveUrl: "https://apps.apple.com/swiftquiz",
-    team: "red",
-    screenshotImages: [
-      "/images/swiftquiz/screenshot1.png",
-      "/images/swiftquiz/screenshot2.png",
-    ],
-  },
-  RedFarmOutpost: {
-    title: "Scheduler Backend",
-    description:
-      "High-performance task scheduler written in C. Implements priority queues, efficient memory management, and multi-threading for concurrent task execution. Designed for embedded systems and resource-constrained environments.",
-    emoji: "⚙️",
-    techStack: ["C", "Multi-threading", "Data Structures"],
-    githubUrl: "https://github.com/quinn-caverly/scheduler",
-    team: "red",
-    flowchartImages: ["/images/scheduler/architecture.png"],
-  },
-  RedEdgeOutpost: {
-    title: "Interactive Portfolio",
-    description:
-      "This portfolio site you're viewing! Built with React, Three.js, and Next.js. Features an interactive 3D map, glassmorphism UI, animated backgrounds, and responsive design. Includes fallback for corporate firewalls.",
-    emoji: "🌐",
-    techStack: ["React", "Three.js", "Next.js", "TypeScript"],
-    githubUrl: "https://github.com/quinn-caverly/portfolio",
-    liveUrl: "https://quinncaverly.com",
-    team: "red",
-    youtubeVideos: ["https://www.youtube.com/embed/build-timelapse"],
-  },
-  AboutMe: {
-    title: "About Quinn Caverly",
-    description:
-      "Software Engineer passionate about building interactive experiences and elegant solutions. Experienced in full-stack development, 3D graphics, and system design. Currently exploring WebGL, Rust, and distributed systems.",
-    emoji: "😎",
-    techStack: [],
-    team: "blue",
-  },
-};
 
 export function ProjectContent({
   projectName,
   isDayMode,
   onClose,
+  layoutMode = "center",
 }: ProjectContentProps) {
-  const project = projectData[projectName];
+  const project = PROJECTS[projectName];
 
   if (!project) return null;
 
@@ -236,9 +132,7 @@ export function ProjectContent({
                   padding: "10px 20px",
                   borderRadius: "8px",
                   backgroundColor: isDayMode ? "#ffffff" : "#1f2937",
-                  border: isDayMode
-                    ? "1px solid #e5e7eb"
-                    : "1px solid #374151",
+                  border: isDayMode ? "1px solid #e5e7eb" : "1px solid #374151",
                   color: isDayMode ? "#111827" : "#f9fafb",
                   textDecoration: "none",
                   fontSize: "14px",
@@ -293,11 +187,12 @@ export function ProjectContent({
             <div
               style={{
                 display: "flex",
-                flexDirection:
-                  projectName === "BlueCapital" ? "row" : "column",
+                flexDirection: projectName === "BlueCapital" ? "row" : "column",
                 gap: "16px",
                 justifyContent:
-                  projectName === "BlueCapital" ? "space-between" : "flex-start",
+                  projectName === "BlueCapital"
+                    ? "space-between"
+                    : "flex-start",
               }}
             >
               {project.youtubeVideos.map((videoUrl, index) => (
@@ -348,9 +243,7 @@ export function ProjectContent({
               style={{
                 width: "100%",
                 borderRadius: "8px",
-                border: isDayMode
-                  ? "1px solid #e5e7eb"
-                  : "1px solid #374151",
+                border: isDayMode ? "1px solid #e5e7eb" : "1px solid #374151",
               }}
             />
           </div>
@@ -378,9 +271,7 @@ export function ProjectContent({
                 style={{
                   width: "100%",
                   borderRadius: "8px",
-                  border: isDayMode
-                    ? "1px solid #e5e7eb"
-                    : "1px solid #374151",
+                  border: isDayMode ? "1px solid #e5e7eb" : "1px solid #374151",
                 }}
               />
             )}
@@ -393,9 +284,7 @@ export function ProjectContent({
                   width: "100%",
                   borderRadius: "8px",
                   marginBottom: "12px",
-                  border: isDayMode
-                    ? "1px solid #e5e7eb"
-                    : "1px solid #374151",
+                  border: isDayMode ? "1px solid #e5e7eb" : "1px solid #374151",
                 }}
               />
             ))}
@@ -408,9 +297,7 @@ export function ProjectContent({
                   width: "100%",
                   borderRadius: "8px",
                   marginBottom: "12px",
-                  border: isDayMode
-                    ? "1px solid #e5e7eb"
-                    : "1px solid #374151",
+                  border: isDayMode ? "1px solid #e5e7eb" : "1px solid #374151",
                 }}
               />
             ))}

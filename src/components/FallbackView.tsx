@@ -2,77 +2,20 @@
 
 import { Card } from "antd";
 import { useState } from "react";
+import Image from "next/image";
+import { PROJECT_LIST, GLASSMORPHISM_STYLES } from "@/constants/projects";
 
 interface FallbackViewProps {
   isDayMode: boolean;
   onProjectClick: (projectName: string) => void;
+  isMobile?: boolean;
 }
 
-const projects = [
-  {
-    name: "BlueCapital",
-    title: "Mods for YouTube",
-    description: "Custom Minecraft mods in Java for YouTube videos",
-    techStack: "Java",
-    emoji: "🎮",
-    image: "/images/knavishmantis/knavishmantis-icon.png",
-    team: "blue",
-  },
-  {
-    name: "RedCapital",
-    title: "iOS App",
-    description: "Native iOS application built with Swift",
-    techStack: "Swift",
-    emoji: "📱",
-    image: "/images/swiftquiz/swiftquiz-icon.png",
-    team: "red",
-  },
-  {
-    name: "BluePlainsOutpost",
-    title: "Learn Rust Site",
-    description: "Interactive learning platform for Rust programming",
-    techStack: "React",
-    emoji: "🦀",
-    team: "blue",
-  },
-  {
-    name: "BlueLakeOutpost",
-    title: "F1 Telemetry Viz",
-    description: "Formula 1 telemetry visualization pipeline",
-    techStack: "Python",
-    emoji: "🏎️",
-    image: "/images/f1dataviz/f1dataviz-icon.png",
-    team: "blue",
-  },
-  {
-    name: "RedFarmOutpost",
-    title: "Scheduler Backend",
-    description: "High-performance task scheduler in C",
-    techStack: "C",
-    emoji: "⚙️",
-    image: "/images/scheduler/scheduler-logo.png",
-    team: "red",
-  },
-  {
-    name: "RedEdgeOutpost",
-    title: "This Portfolio Site",
-    description: "Interactive 3D portfolio with React & Three.js",
-    techStack: "React",
-    emoji: "🌐",
-    image: "/images/portfolio/portfolio-preview.png",
-    team: "red",
-  },
-  {
-    name: "AboutMe",
-    title: "About Me",
-    description: "Learn more about Quinn Caverly",
-    techStack: "",
-    emoji: "😎",
-    team: "blue",
-  },
-];
-
-export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
+export function FallbackView({
+  isDayMode,
+  onProjectClick,
+  isMobile = false,
+}: FallbackViewProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   return (
@@ -99,14 +42,9 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
             marginBottom: "32px",
             padding: "24px",
             borderRadius: "16px",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            backgroundColor: isDayMode
-              ? "rgba(255, 255, 255, 0.95)"
-              : "rgba(15, 15, 26, 0.95)",
-            border: isDayMode
-              ? "1px solid rgba(255, 255, 255, 0.5)"
-              : "1px solid rgba(255, 255, 255, 0.1)",
+            ...(isDayMode
+              ? GLASSMORPHISM_STYLES.light
+              : GLASSMORPHISM_STYLES.dark),
             boxShadow: isDayMode
               ? "0 10px 30px -5px rgba(0, 0, 0, 0.1)"
               : "0 10px 30px -5px rgba(0, 0, 0, 0.3)",
@@ -120,7 +58,9 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
               color: isDayMode ? "#111827" : "#f9fafb",
             }}
           >
-            🚧 Oops! Content Blocked by Firewall
+            {isMobile
+              ? "📱 Mobile View"
+              : "🚧 Oops! Content Blocked by Firewall"}
           </h2>
           <p
             style={{
@@ -130,8 +70,9 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
               color: isDayMode ? "#4b5563" : "#d1d5db",
             }}
           >
-            It looks like your network is blocking the 3D interactive scene.
-            This is what it normally looks like:
+            {isMobile
+              ? "This website is optimized for desktop viewing. Here's what it looks like on larger screens:"
+              : "It looks like your network is blocking the 3D interactive scene. This is what it normally looks like:"}
           </p>
 
           {/* Screenshot */}
@@ -145,9 +86,13 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
                 : "1px solid rgba(255, 255, 255, 0.1)",
             }}
           >
-            <img
-              src="/images/what-normally-looks-like.png"
+            <Image
+              src="/images/what-normally-looks-like.png?v=2"
               alt="Normal 3D portfolio view"
+              width={1200}
+              height={675}
+              priority
+              unoptimized
               style={{
                 width: "100%",
                 height: "auto",
@@ -164,7 +109,7 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
               color: isDayMode ? "#4b5563" : "#d1d5db",
             }}
           >
-            But don't worry! You can still view all my projects below:
+            But don&apos;t worry! You can still view all my projects below:
           </p>
         </div>
 
@@ -176,7 +121,7 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
             gap: "24px",
           }}
         >
-          {projects.map((project) => (
+          {PROJECT_LIST.map((project) => (
             <Card
               key={project.name}
               hoverable
@@ -185,14 +130,9 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
               onMouseLeave={() => setHoveredCard(null)}
               style={{
                 borderRadius: "16px",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                backgroundColor: isDayMode
-                  ? "rgba(255, 255, 255, 0.95)"
-                  : "rgba(15, 15, 26, 0.95)",
-                border: isDayMode
-                  ? "1px solid rgba(255, 255, 255, 0.5)"
-                  : "1px solid rgba(255, 255, 255, 0.1)",
+                ...(isDayMode
+                  ? GLASSMORPHISM_STYLES.light
+                  : GLASSMORPHISM_STYLES.dark),
                 boxShadow:
                   hoveredCard === project.name
                     ? isDayMode
@@ -219,9 +159,11 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
                 }}
               >
                 {project.image ? (
-                  <img
+                  <Image
                     src={project.image}
                     alt={project.title}
+                    width={80}
+                    height={80}
                     style={{
                       maxWidth: "80px",
                       maxHeight: "80px",
@@ -244,7 +186,7 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
               >
                 {project.title}
               </h3>
-              {project.techStack && (
+              {project.techStack.length > 0 && (
                 <div
                   style={{
                     textAlign: "center",
@@ -254,7 +196,7 @@ export function FallbackView({ isDayMode, onProjectClick }: FallbackViewProps) {
                     color: "#667eea",
                   }}
                 >
-                  {project.techStack}
+                  {project.techStack.join(", ")}
                 </div>
               )}
               <p
