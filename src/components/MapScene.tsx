@@ -13,6 +13,9 @@ interface MapSceneProps {
   focus: FocusState | null;
   setFocus: (focus: FocusState | null) => void;
   isDayMode: boolean;
+  selectedProject: string | null;
+  setSelectedProject: (project: string | null) => void;
+  onError?: () => void;
 }
 
 const OverlayBridge = memo(function OverlayBridge({
@@ -65,7 +68,14 @@ const OverlayBridge = memo(function OverlayBridge({
   return null;
 });
 
-export function MapScene({ focus, setFocus, isDayMode }: MapSceneProps) {
+export function MapScene({
+  focus,
+  setFocus,
+  isDayMode,
+  selectedProject,
+  setSelectedProject,
+  onError,
+}: MapSceneProps) {
   const [markerData, setMarkerData] = useState<
     Array<{
       name: string;
@@ -75,7 +85,7 @@ export function MapScene({ focus, setFocus, isDayMode }: MapSceneProps) {
   >([]);
   const [camera, setCamera] = useState<THREE.Camera | null>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+
   const [isResetting, setIsResetting] = useState(false);
   const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -158,7 +168,7 @@ export function MapScene({ focus, setFocus, isDayMode }: MapSceneProps) {
 
     // Reset camera to original default position
     setFocus({
-      pos: [7, 5, 0],
+      pos: [7, 3.3, 0],
       target: [0, 0, 0],
       isDetailView: false,
     });
@@ -186,18 +196,24 @@ export function MapScene({ focus, setFocus, isDayMode }: MapSceneProps) {
   return (
     <>
       <Canvas
-        camera={{ position: [7, 5, 0], fov: 50 }}
+        camera={{ position: [7, 3.3, 0], fov: 50 }}
         style={{ width: "100vw", height: "100vh" }}
         shadows
         frameloop="always"
         dpr={[1, 2]}
+        gl={{ alpha: true }}
+        onCreated={(state) => {
+          // Catch WebGL context errors
+          const gl = state.gl.getContext();
+          if (!gl) {
+            onError?.();
+          }
+        }}
+        onError={(error) => {
+          console.error("Three.js error:", error);
+          onError?.();
+        }}
       >
-        <color attach="background" args={[isDayMode ? "#87CEEB" : "#0a0a1a"]} />
-        <fogExp2
-          attach="fog"
-          args={[isDayMode ? "#87CEEB" : "#0a0a1a", isDayMode ? 0.015 : 0.02]}
-        />
-
         <group visible={!isDayMode}>
           <Stars
             radius={100}

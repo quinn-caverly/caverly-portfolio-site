@@ -223,7 +223,7 @@ export function MarkerOverlays({
                 className="absolute pointer-events-auto cursor-pointer origin-bottom"
                 style={{
                   left: `${marker.screenX}px`,
-                  top: `${marker.screenY - 40}px`,
+                  top: `${marker.screenY - 20}px`,
                   transform: shouldHide
                     ? "translate(-50%, -100%) scale(0)"
                     : "translate(-50%, -100%) scale(1)",
@@ -236,9 +236,12 @@ export function MarkerOverlays({
               >
                 <Card
                   hoverable
-                  className="rounded-lg overflow-hidden transition-all duration-300"
+                  className="rounded-lg overflow-hidden"
                   style={{
-                    width: isHovered ? 320 : 220,
+                    width: isHovered ? 320 : 200,
+                    height: isHovered ? "auto" : "75px",
+                    transition:
+                      "width 0.3s ease, height 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease",
                     boxShadow: isHovered
                       ? isDayMode
                         ? "0 8px 24px rgba(0, 0, 0, 0.15)"
@@ -246,14 +249,25 @@ export function MarkerOverlays({
                       : isDayMode
                         ? "0 4px 12px rgba(0, 0, 0, 0.08)"
                         : "0 4px 12px rgba(0, 0, 0, 0.15)",
-                    backgroundColor: isDayMode ? "#ffffff" : "#1a1a1a",
-                    border: isDayMode ? undefined : "none",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    backgroundColor: isDayMode
+                      ? "rgba(255, 255, 255, 0.95)"
+                      : "rgba(15, 15, 26, 0.95)",
+                    border: isDayMode
+                      ? "1px solid rgba(255, 255, 255, 0.5)"
+                      : "1px solid rgba(255, 255, 255, 0.1)",
+                    transform: isHovered ? "translateY(-4px)" : "none",
                   }}
                   styles={{ body: { padding: 0 } }}
                 >
                   {isHovered ? (
                     // Expanded view on hover
-                    <div>
+                    <div
+                      style={{
+                        animation: "fadeIn 0.3s ease",
+                      }}
+                    >
                       {marker.name !== "AboutMe" && (
                         <div
                           className="w-full h-40 flex items-center justify-center relative overflow-hidden"
@@ -314,17 +328,33 @@ export function MarkerOverlays({
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center">
+                    <div
+                      style={{
+                        height: "75px",
+                        animation: "fadeIn 0.3s ease",
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        padding: "4px 8px",
+                        gap: "10px",
+                      }}
+                    >
+                      {/* Image or Emoji on Left */}
                       <div
-                        className="w-20 h-20 flex items-center justify-center shrink-0 relative overflow-hidden"
                         style={{
+                          width: "50px",
+                          height: "50px",
+                          flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                           background: info.image
-                            ? marker.name === "RedFarmOutpost"
-                              ? "#d6e9f8"
-                              : "#000000"
+                            ? "transparent"
                             : isDayMode
                               ? "linear-gradient(to bottom right, #dbeafe, #c7d2fe)"
                               : "linear-gradient(to bottom right, #1e3a8a, #3730a3)",
+                          borderRadius: "8px",
+                          overflow: "hidden",
                         }}
                       >
                         {info.image ? (
@@ -332,109 +362,83 @@ export function MarkerOverlays({
                             src={info.image}
                             alt={info.title}
                             style={{
-                              width:
-                                marker.name === "RedFarmOutpost"
-                                  ? "70%"
-                                  : "100%",
-                              height:
-                                marker.name === "RedFarmOutpost"
-                                  ? "70%"
-                                  : "100%",
-                              objectFit:
-                                marker.name === "RedFarmOutpost"
-                                  ? "contain"
-                                  : "cover",
-                              transform:
-                                marker.name === "RedCapital"
-                                  ? "scale(1.2)"
-                                  : marker.name === "BlueLakeOutpost"
-                                    ? "scale(1.5)"
-                                    : marker.name === "RedEdgeOutpost"
-                                      ? "scale(1.8)"
-                                      : "none",
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
                             }}
                           />
                         ) : (
-                          <div className="text-4xl">
+                          <div style={{ fontSize: "28px" }}>
                             {marker.name === "AboutMe" ? "😎" : info.emoji}
                           </div>
                         )}
                       </div>
-                      <div className="flex-1 px-3 py-2">
+
+                      {/* Text Content - Vertical Centered */}
+                      <div
+                        style={{
+                          flex: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          gap: "4px",
+                          minWidth: 0,
+                        }}
+                      >
+                        {/* Title */}
                         <div
-                          className="text-base font-normal leading-snug"
-                          style={{ color: isDayMode ? "#4b5563" : "#d1d5db" }}
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            color: isDayMode ? "#111827" : "#f9fafb",
+                            lineHeight: "1.3",
+                            textAlign: "left",
+                          }}
                         >
-                          {marker.name === "AboutMe" ? (
-                            info.title
-                          ) : (
-                            <>
-                              {marker.name === "BlueCapital" && (
-                                <>
-                                  Mods for YouTube{" "}
-                                  <span style={{ color: "#b07219" }}>
-                                    (Java)
-                                  </span>
-                                </>
-                              )}
-                              {marker.name === "RedCapital" && (
-                                <>
-                                  iOS App{" "}
-                                  <span style={{ color: "#FA7343" }}>
-                                    (Swift)
-                                  </span>
-                                </>
-                              )}
-                              {marker.name === "BluePlainsOutpost" && (
-                                <>
-                                  Learn Rust Site{" "}
-                                  <span style={{ color: "#61DAFB" }}>
-                                    (React)
-                                  </span>
-                                </>
-                              )}
-                              {marker.name === "BlueLakeOutpost" && (
-                                <>
-                                  F1 Telemetry Viz{" "}
-                                  <span style={{ color: "#3776AB" }}>
-                                    (Python)
-                                  </span>
-                                </>
-                              )}
-                              {marker.name === "RedFarmOutpost" && (
-                                <>
-                                  Scheduler Backend{" "}
-                                  <span style={{ color: "#A8B9CC" }}>(C)</span>
-                                </>
-                              )}
-                              {marker.name === "RedEdgeOutpost" && (
-                                <>
-                                  This Portfolio Site{" "}
-                                  <span style={{ color: "#61DAFB" }}>
-                                    (React)
-                                  </span>
-                                </>
-                              )}
-                              {marker.name !== "BlueCapital" &&
-                                marker.name !== "RedCapital" &&
-                                marker.name !== "BluePlainsOutpost" &&
-                                marker.name !== "BlueLakeOutpost" &&
-                                marker.name !== "RedFarmOutpost" &&
-                                marker.name !== "RedEdgeOutpost" &&
-                                info.description}
-                            </>
-                          )}
+                          {marker.name === "AboutMe"
+                            ? "About Me"
+                            : marker.name === "BlueCapital"
+                              ? "Mods for YouTube"
+                              : marker.name === "RedCapital"
+                                ? "iOS App"
+                                : marker.name === "BluePlainsOutpost"
+                                  ? "Learn Rust Site"
+                                  : marker.name === "BlueLakeOutpost"
+                                    ? "F1 Telemetry Viz"
+                                    : marker.name === "RedFarmOutpost"
+                                      ? "Scheduler Backend"
+                                      : marker.name === "RedEdgeOutpost"
+                                        ? "This Portfolio"
+                                        : info.title}
+                        </div>
+
+                        {/* Tech Stack Badge */}
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: "600",
+                            color: "#667eea",
+                            textAlign: "left",
+                          }}
+                        >
+                          {marker.name === "BlueCapital"
+                            ? "Java"
+                            : marker.name === "RedCapital"
+                              ? "Swift"
+                              : marker.name === "BluePlainsOutpost"
+                                ? "React"
+                                : marker.name === "BlueLakeOutpost"
+                                  ? "Python"
+                                  : marker.name === "RedFarmOutpost"
+                                    ? "C"
+                                    : marker.name === "RedEdgeOutpost"
+                                      ? "React"
+                                      : ""}
                         </div>
                       </div>
                     </div>
                   )}
                 </Card>
-
-                {/* Small dot at exact 3D position */}
-                <div
-                  className="absolute left-1/2 w-1.5 h-1.5 rounded-full bg-[#1890ff] -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(24,144,255,0.6)]"
-                  style={{ top: "calc(100% + 40px)" }}
-                />
               </div>
             );
           })}
@@ -442,20 +446,29 @@ export function MarkerOverlays({
   );
 }
 
-// Add keyframe animation for cards appearing
-const style = document.createElement("style");
-style.textContent = `
-  @keyframes scaleUp {
-    from {
-      transform: translate(-50%, -100%) scale(0.8);
-      opacity: 0;
-    }
-    to {
-      transform: translate(-50%, -100%) scale(1);
-      opacity: 0.95;
-    }
-  }
-`;
+// Add keyframe animations
 if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes scaleUp {
+      from {
+        transform: translate(-50%, -100%) scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, -100%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  `;
   document.head.appendChild(style);
 }

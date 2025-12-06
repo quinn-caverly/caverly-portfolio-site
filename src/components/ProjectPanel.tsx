@@ -4,6 +4,7 @@ interface ProjectPanelProps {
   projectName: string | null;
   onClose: () => void;
   isDayMode: boolean;
+  isFallbackMode?: boolean;
 }
 
 const projectData: Record<
@@ -222,9 +223,16 @@ export function ProjectPanel({
                 top: 0,
                 ...(project.team === "blue" ? { left: 0 } : { right: 0 }),
                 bottom: 0,
-                width: "33.333vw",
+                width: "40vw",
               }),
-          background: isDayMode ? "#ffffff" : "#1a1a1a",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          background: isDayMode
+            ? "rgba(255, 255, 255, 0.75)"
+            : "rgba(15, 15, 26, 0.75)",
+          border: isDayMode
+            ? "1px solid rgba(255, 255, 255, 0.5)"
+            : "1px solid rgba(255, 255, 255, 0.1)",
           boxShadow: isAboutMe
             ? "0 -4px 24px rgba(0, 0, 0, 0.5)"
             : project.team === "blue"
@@ -324,8 +332,13 @@ export function ProjectPanel({
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection:
+                    projectName === "BlueCapital" ? "row" : "column",
                   gap: "16px",
+                  justifyContent:
+                    projectName === "BlueCapital"
+                      ? "space-between"
+                      : "flex-start",
                 }}
               >
                 {project.youtubeVideos.map((videoUrl, index) => (
@@ -335,11 +348,12 @@ export function ProjectPanel({
                       borderRadius: "8px",
                       overflow: "hidden",
                       background: "#000",
+                      flex: projectName === "BlueCapital" ? "1" : "none",
                     }}
                   >
                     <iframe
                       width="100%"
-                      height="315"
+                      height={projectName === "BlueCapital" ? "400" : "315"}
                       src={videoUrl}
                       title="YouTube video"
                       frameBorder="0"

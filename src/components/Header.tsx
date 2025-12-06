@@ -1,13 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface HeaderProps {
   isDayMode: boolean;
   setIsDayMode: (value: boolean) => void;
+  selectedProject?: string | null;
+  onHomeClick?: () => void;
 }
 
-export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
+export function Header({
+  isDayMode,
+  setIsDayMode,
+  selectedProject,
+  onHomeClick,
+}: HeaderProps) {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [isNameHovered, setIsNameHovered] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const socialLinks = [
     {
@@ -56,155 +72,400 @@ export function Header({ isDayMode, setIsDayMode }: HeaderProps) {
     },
   ];
 
+  // Determine if project is on left (blue team) or right (red team)
+  const isProjectOnLeft =
+    selectedProject?.startsWith("Blue") || selectedProject === "AboutMe";
+  const isProjectOnRight = selectedProject?.startsWith("Red");
+
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[1000] transition-colors duration-300"
+      className="fixed top-6 z-[1000] transition-all duration-500 ease-out"
       style={{
-        backgroundColor: isDayMode ? "#ffffff" : "#0f0f0f",
-        borderBottom: isDayMode ? "2px solid #e5e7eb" : "2px solid #333333",
-        boxShadow: isDayMode
-          ? "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
-          : "0 4px 6px -1px rgba(0, 0, 0, 0.3)",
+        left: selectedProject
+          ? isProjectOnLeft
+            ? "calc(40vw + 24px)"
+            : "24px"
+          : "50%",
+        transform: selectedProject
+          ? scrolled
+            ? "translateY(-2px)"
+            : "translateY(0)"
+          : `translateX(-50%) ${scrolled ? "translateY(-2px)" : "translateY(0)"}`,
+        width: selectedProject ? "calc(60vw - 48px)" : "calc(100% - 48px)",
+        maxWidth: selectedProject ? "none" : "1400px",
       }}
     >
-      {/* Grid background overlay */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        className="relative"
+        style={{
+          borderRadius: "24px",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          backgroundColor: isDayMode
+            ? "rgba(255, 255, 255, 0.75)"
+            : "rgba(15, 15, 26, 0.75)",
+          border: isDayMode
+            ? "1px solid rgba(255, 255, 255, 0.5)"
+            : "1px solid rgba(255, 255, 255, 0.1)",
+          boxShadow: scrolled
+            ? isDayMode
+              ? "0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)"
+              : "0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)"
+            : isDayMode
+              ? "0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.03)"
+              : "0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.03)",
+          transition:
+            "background-color 0.3s ease, border 0.3s ease, box-shadow 0.5s ease",
+        }}
+      >
+        {/* Subtle gradient overlay */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 opacity-30 pointer-events-none transition-opacity duration-300"
           style={{
-            backgroundImage: isDayMode
-              ? `linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
-                 linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px)`
-              : `linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                 linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px)`,
-            backgroundSize: "40px 40px",
+            background: isDayMode
+              ? "linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(59, 130, 246, 0.05) 50%, rgba(236, 72, 153, 0.05) 100%)"
+              : "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(236, 72, 153, 0.1) 100%)",
+            borderRadius: "24px",
+            overflow: "hidden",
           }}
         />
-      </div>
 
-      <div className="max-w-full mx-auto px-8 py-5 flex items-center justify-between relative z-10">
-        {/* Left: Name (emoji appears on hover) */}
+        {/* Noise texture for glass effect */}
         <div
-          className="flex items-center gap-3 pl-4 cursor-pointer"
-          style={{ height: "32px" }}
-          onMouseEnter={() => setIsNameHovered(true)}
-          onMouseLeave={() => setIsNameHovered(false)}
-        >
-          <h1
-            className="m-0 font-bold tracking-wide whitespace-nowrap transition-all duration-300"
-            style={{
-              color: isDayMode ? "#111827" : "#f9fafb",
-              fontSize: isNameHovered ? "1.75rem" : "1.5rem",
-            }}
-          >
-            Quinn Caverly
-          </h1>
-          <span
-            className="text-2xl transition-all duration-300"
-            style={{
-              opacity: isNameHovered ? 1 : 0,
-              maxWidth: isNameHovered ? "40px" : "0px",
-              overflow: "hidden",
-            }}
-          >
-            😎
-          </span>
-        </div>
+          className="absolute inset-0 opacity-20 pointer-events-none mix-blend-soft-light"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+            backgroundSize: "200px 200px",
+            borderRadius: "24px",
+            overflow: "hidden",
+          }}
+        />
 
-        {/* Center: Social Icons */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ width: "800px", height: "30px" }}
+          className="relative px-8 py-4 flex items-center justify-between"
+          style={{ borderRadius: "24px" }}
         >
-          {socialLinks.map((link, index) => {
-            const isHovered = hoveredLink === link.id;
-            const spacing = [0, 240, 500, 700]; // Fixed positions for each icon with text space
-            return (
-              <div
-                key={link.id}
-                className="absolute"
+          {/* Left: Home icon and Name with gradient effect */}
+          <div className="flex items-center gap-4">
+            {/* Home icon - always visible, more prominent when project is selected */}
+            <button
+              onClick={onHomeClick}
+              className="flex items-center justify-center transition-all duration-300 hover:scale-110"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "12px",
+                backgroundColor: selectedProject
+                  ? isDayMode
+                    ? "rgba(102, 126, 234, 0.15)"
+                    : "rgba(167, 139, 250, 0.2)"
+                  : isDayMode
+                    ? "rgba(102, 126, 234, 0.08)"
+                    : "rgba(255, 255, 255, 0.05)",
+                border: "none",
+                cursor: "pointer",
+                color: selectedProject
+                  ? isDayMode
+                    ? "#667eea"
+                    : "#a78bfa"
+                  : isDayMode
+                    ? "#667eea"
+                    : "#6b7280",
+                opacity: selectedProject ? 1 : 0.6,
+              }}
+              aria-label="Home"
+              title="Back to Home"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            </button>
+
+            <div
+              className="flex items-center gap-3 cursor-pointer"
+              style={{ height: "40px" }}
+              onMouseEnter={() => setIsNameHovered(true)}
+              onMouseLeave={() => setIsNameHovered(false)}
+            >
+              <div style={{ position: "relative", display: "inline-block" }}>
+                {/* Day mode gradient */}
+                <h1
+                  className="m-0 font-bold tracking-wide whitespace-nowrap"
+                  style={{
+                    position: isDayMode ? "relative" : "absolute",
+                    fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+                    background:
+                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    transition: "font-size 0.3s ease, opacity 0.3s ease",
+                    opacity: isDayMode ? 1 : 0,
+                    pointerEvents: isDayMode ? "auto" : "none",
+                  }}
+                >
+                  Quinn Caverly
+                </h1>
+                {/* Night mode gradient */}
+                <h1
+                  className="m-0 font-bold tracking-wide whitespace-nowrap"
+                  style={{
+                    position: isDayMode ? "absolute" : "relative",
+                    top: 0,
+                    left: 0,
+                    fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+                    background:
+                      "linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    transition: "font-size 0.3s ease, opacity 0.3s ease",
+                    opacity: isDayMode ? 0 : 1,
+                    pointerEvents: isDayMode ? "none" : "auto",
+                  }}
+                >
+                  Quinn Caverly
+                </h1>
+              </div>
+              <span
+                className="text-2xl transition-all duration-300"
                 style={{
-                  left: `${spacing[index]}px`,
-                  top: "50%",
-                  transform: "translateY(-50%)",
+                  opacity: isNameHovered ? 1 : 0,
+                  transform: isNameHovered
+                    ? "scale(1) rotate(0deg)"
+                    : "scale(0.5) rotate(-20deg)",
+                  maxWidth: isNameHovered ? "40px" : "0px",
+                  overflow: "hidden",
                 }}
               >
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-all duration-200 hover:scale-110 hover:opacity-100 flex items-center gap-2 whitespace-nowrap"
-                  style={{
-                    color: isDayMode ? "#6b7280" : "#9ca3af",
-                    opacity: 0.85,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = isDayMode
-                      ? "#111827"
-                      : "#f9fafb";
-                    e.currentTarget.style.opacity = "1";
-                    setHoveredLink(link.id);
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = isDayMode
-                      ? "#6b7280"
-                      : "#9ca3af";
-                    e.currentTarget.style.opacity = "0.85";
-                    setHoveredLink(null);
-                  }}
-                  aria-label={link.label}
-                  title={link.label}
+                😎
+              </span>
+            </div>
+          </div>
+
+          {/* Center: Social Icons with Dropdown */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{ display: "flex", gap: "8px", alignItems: "center" }}
+          >
+            {socialLinks.map((link) => {
+              const isHovered = hoveredLink === link.id;
+              return (
+                <div
+                  key={link.id}
+                  className="relative"
+                  onMouseEnter={() => setHoveredLink(link.id)}
+                  onMouseLeave={() => setHoveredLink(null)}
                 >
-                  <span className="shrink-0">{link.icon}</span>
-                  <span
-                    className="text-sm font-medium transition-all duration-200"
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center transition-all duration-300"
                     style={{
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "12px",
+                      color: isHovered
+                        ? isDayMode
+                          ? "#667eea"
+                          : "#a78bfa"
+                        : isDayMode
+                          ? "#374151"
+                          : "#d1d5db",
+                      backgroundColor: isHovered
+                        ? isDayMode
+                          ? "rgba(102, 126, 234, 0.1)"
+                          : "rgba(167, 139, 250, 0.15)"
+                        : "transparent",
+                      transform: isHovered
+                        ? "translateY(-2px) scale(1.05)"
+                        : "translateY(0) scale(1)",
+                    }}
+                    aria-label={link.label}
+                    title={link.label}
+                  >
+                    <span className="shrink-0">{link.icon}</span>
+                  </a>
+
+                  {/* Dropdown menu */}
+                  <div
+                    className="absolute transition-all duration-300 pointer-events-none"
+                    style={{
+                      top: "calc(100% + 8px)",
+                      left: "50%",
                       opacity: isHovered ? 1 : 0,
+                      transform: isHovered
+                        ? "translateX(-50%) translateY(0)"
+                        : "translateX(-50%) translateY(-10px)",
+                      visibility: isHovered ? "visible" : "hidden",
+                      zIndex: 10000,
                     }}
                   >
-                    {link.text}
-                  </span>
-                </a>
-              </div>
-            );
-          })}
-        </div>
+                    <div
+                      className="relative overflow-hidden"
+                      style={{
+                        minWidth: "240px",
+                        padding: "16px 20px",
+                        borderRadius: "12px",
+                        backdropFilter: "blur(20px)",
+                        WebkitBackdropFilter: "blur(20px)",
+                        backgroundColor: isDayMode
+                          ? "rgba(255, 255, 255, 0.95)"
+                          : "rgba(15, 15, 26, 0.95)",
+                        border: isDayMode
+                          ? "1px solid rgba(255, 255, 255, 0.5)"
+                          : "1px solid rgba(255, 255, 255, 0.1)",
+                        boxShadow: isDayMode
+                          ? "0 10px 30px -5px rgba(0, 0, 0, 0.2)"
+                          : "0 10px 30px -5px rgba(0, 0, 0, 0.6)",
+                      }}
+                    >
+                      {/* Arrow */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-6px",
+                          left: "50%",
+                          width: "12px",
+                          height: "12px",
+                          backgroundColor: isDayMode
+                            ? "rgba(255, 255, 255, 0.95)"
+                            : "rgba(15, 15, 26, 0.95)",
+                          borderTop: isDayMode
+                            ? "1px solid rgba(255, 255, 255, 0.5)"
+                            : "1px solid rgba(255, 255, 255, 0.1)",
+                          borderLeft: isDayMode
+                            ? "1px solid rgba(255, 255, 255, 0.5)"
+                            : "1px solid rgba(255, 255, 255, 0.1)",
+                          transform: "translateX(-50%) rotate(45deg)",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          gap: "8px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              color: isDayMode ? "#6b7280" : "#9ca3af",
+                            }}
+                          >
+                            {link.icon}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "15px",
+                              fontWeight: 600,
+                              color: isDayMode ? "#111827" : "#f9fafb",
+                            }}
+                          >
+                            {link.label}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            color: isDayMode ? "#374151" : "#d1d5db",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {link.text}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-        {/* Right: Toggle Checkbox */}
-        <div className="flex items-center gap-3 pr-4">
-          <span
-            className="text-sm font-medium transition-colors duration-300"
-            style={{ color: isDayMode ? "#6b7280" : "#9ca3af" }}
-          >
-            {isDayMode ? "Light" : "Dark"}
-          </span>
-          <label className="relative inline-block w-12 h-7 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isDayMode}
-              onChange={(e) => setIsDayMode(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div
-              className="w-full h-full rounded-full transition-all duration-300 peer-checked:bg-gradient-to-r peer-checked:from-amber-400 peer-checked:to-orange-500"
+          {/* Right: Enhanced Toggle */}
+          <div className="flex items-center gap-3">
+            <span
+              className="text-sm font-medium"
               style={{
-                background: isDayMode
-                  ? undefined
-                  : "linear-gradient(135deg, #667eea, #764ba2)",
-                boxShadow: isDayMode
-                  ? "0 2px 8px rgba(251, 146, 60, 0.4)"
-                  : "0 2px 8px rgba(102, 126, 234, 0.4)",
+                color: isDayMode ? "#6b7280" : "#9ca3af",
+                transition: "color 0.3s ease",
               }}
-            />
-            <div
-              className="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-md"
-              style={{
-                transform: isDayMode ? "translateX(20px)" : "translateX(0)",
-              }}
-            />
-          </label>
+            >
+              {isDayMode ? "Light" : "Dark"}
+            </span>
+            <label className="relative inline-block w-14 h-8 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={isDayMode}
+                onChange={(e) => setIsDayMode(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div
+                className="w-full h-full rounded-full transition-all duration-500 relative overflow-hidden"
+                style={{
+                  background: isDayMode
+                    ? "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)"
+                    : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  boxShadow: isDayMode
+                    ? "0 4px 12px rgba(251, 191, 36, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3)"
+                    : "0 4px 12px rgba(102, 126, 234, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                {/* Shimmer effect */}
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent)",
+                    transform: "translateX(-100%)",
+                    animation: "shimmer 3s infinite",
+                  }}
+                />
+              </div>
+              <div
+                className="absolute top-1 left-1 w-6 h-6 rounded-full transition-all duration-500 shadow-lg flex items-center justify-center"
+                style={{
+                  transform: isDayMode ? "translateX(24px)" : "translateX(0)",
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <span className="text-xs">{isDayMode ? "☀️" : "🌙"}</span>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+      `}</style>
     </header>
   );
 }
