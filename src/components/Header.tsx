@@ -162,7 +162,7 @@ export function Header({
           className="relative px-8 py-4 flex items-center justify-between"
           style={{ borderRadius: "24px" }}
         >
-          {/* Left: Home icon and Name with gradient effect */}
+          {/* Left: Home icon, Name (desktop only), and Social Icons (mobile only) */}
           <div className="flex items-center gap-4">
             {/* Home icon - hide in fallback mode */}
             {!isFallbackMode && (
@@ -210,86 +210,79 @@ export function Header({
               </button>
             )}
 
-            <div
-              className="flex items-center gap-3 cursor-pointer"
-              style={{ height: "40px" }}
-              onMouseEnter={() => setIsNameHovered(true)}
-              onMouseLeave={() => setIsNameHovered(false)}
-            >
-              <div style={{ position: "relative", display: "inline-block" }}>
-                {/* Day mode gradient */}
-                <h1
-                  className="m-0 font-bold tracking-wide whitespace-nowrap"
+            {!isMobile && (
+              <div
+                className="flex items-center gap-3 cursor-pointer"
+                style={{ height: "40px" }}
+                onMouseEnter={() => setIsNameHovered(true)}
+                onMouseLeave={() => setIsNameHovered(false)}
+              >
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  {/* Day mode gradient */}
+                  <h1
+                    className="m-0 font-bold tracking-wide whitespace-nowrap"
+                    style={{
+                      position: isDayMode ? "relative" : "absolute",
+                      fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      transition: "font-size 0.3s ease, opacity 0.3s ease",
+                      opacity: isDayMode ? 1 : 0,
+                      pointerEvents: isDayMode ? "auto" : "none",
+                    }}
+                  >
+                    Quinn Caverly
+                  </h1>
+                  {/* Night mode gradient */}
+                  <h1
+                    className="m-0 font-bold tracking-wide whitespace-nowrap"
+                    style={{
+                      position: isDayMode ? "absolute" : "relative",
+                      top: 0,
+                      left: 0,
+                      fontSize: isNameHovered ? "1.75rem" : "1.5rem",
+                      background:
+                        "linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      transition: "font-size 0.3s ease, opacity 0.3s ease",
+                      opacity: isDayMode ? 0 : 1,
+                      pointerEvents: isDayMode ? "none" : "auto",
+                    }}
+                  >
+                    Quinn Caverly
+                  </h1>
+                </div>
+                <span
+                  className="text-2xl transition-all duration-300"
                   style={{
-                    position: isDayMode ? "relative" : "absolute",
-                    fontSize: isMobile
-                      ? "1.125rem"
-                      : isNameHovered
-                        ? "1.75rem"
-                        : "1.5rem",
-                    background:
-                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    transition: "font-size 0.3s ease, opacity 0.3s ease",
-                    opacity: isDayMode ? 1 : 0,
-                    pointerEvents: isDayMode ? "auto" : "none",
+                    opacity: isNameHovered ? 1 : 0,
+                    transform: isNameHovered
+                      ? "scale(1) rotate(0deg)"
+                      : "scale(0.5) rotate(-20deg)",
+                    maxWidth: isNameHovered ? "40px" : "0px",
+                    overflow: "hidden",
                   }}
                 >
-                  Quinn Caverly
-                </h1>
-                {/* Night mode gradient */}
-                <h1
-                  className="m-0 font-bold tracking-wide whitespace-nowrap"
-                  style={{
-                    position: isDayMode ? "absolute" : "relative",
-                    top: 0,
-                    left: 0,
-                    fontSize: isMobile
-                      ? "1.125rem"
-                      : isNameHovered
-                        ? "1.75rem"
-                        : "1.5rem",
-                    background:
-                      "linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    transition: "font-size 0.3s ease, opacity 0.3s ease",
-                    opacity: isDayMode ? 0 : 1,
-                    pointerEvents: isDayMode ? "none" : "auto",
-                  }}
-                >
-                  Quinn Caverly
-                </h1>
+                  😎
+                </span>
               </div>
-              <span
-                className="text-2xl transition-all duration-300"
+            )}
+
+            {/* Social Icons - Left aligned on mobile */}
+            {isMobile && (
+              <div
                 style={{
-                  opacity: isNameHovered ? 1 : 0,
-                  transform: isNameHovered
-                    ? "scale(1) rotate(0deg)"
-                    : "scale(0.5) rotate(-20deg)",
-                  maxWidth: isNameHovered ? "40px" : "0px",
-                  overflow: "hidden",
+                  display: "flex",
+                  gap: "4px",
+                  alignItems: "center",
                 }}
               >
-                😎
-              </span>
-            </div>
-          </div>
-
-          {/* Center: Social Icons with Dropdown */}
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{
-              display: "flex",
-              gap: isMobile ? "4px" : "8px",
-              alignItems: "center",
-            }}
-          >
-            {socialLinks.map((link) => {
+                {socialLinks.map((link) => {
               const isHovered = hoveredLink === link.id;
               return (
                 <div
@@ -429,8 +422,164 @@ export function Header({
                   </div>
                 </div>
               );
-            })}
+                })}
+              </div>
+            )}
           </div>
+
+          {/* Center: Social Icons with Dropdown (Desktop only) */}
+          {!isMobile && (
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              style={{
+                display: "flex",
+                gap: "8px",
+                alignItems: "center",
+              }}
+            >
+              {socialLinks.map((link) => {
+                const isHovered = hoveredLink === link.id;
+                return (
+                  <div
+                    key={link.id}
+                    className="relative"
+                    onMouseEnter={() => setHoveredLink(link.id)}
+                    onMouseLeave={() => setHoveredLink(null)}
+                  >
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center transition-all duration-300"
+                      style={{
+                        width: "44px",
+                        height: "44px",
+                        borderRadius: "12px",
+                        color: isHovered
+                          ? isDayMode
+                            ? "#667eea"
+                            : "#a78bfa"
+                          : isDayMode
+                            ? "#374151"
+                            : "#d1d5db",
+                        backgroundColor: isHovered
+                          ? isDayMode
+                            ? "rgba(102, 126, 234, 0.1)"
+                            : "rgba(167, 139, 250, 0.15)"
+                          : "transparent",
+                        transform: isHovered
+                          ? "translateY(-2px) scale(1.05)"
+                          : "translateY(0) scale(1)",
+                      }}
+                      aria-label={link.label}
+                      title={link.label}
+                    >
+                      <span className="shrink-0">{link.icon}</span>
+                    </a>
+
+                    {/* Dropdown menu */}
+                    <div
+                      className="absolute transition-all duration-300 pointer-events-none"
+                      style={{
+                        top: "calc(100% + 8px)",
+                        left: "50%",
+                        opacity: isHovered ? 1 : 0,
+                        transform: isHovered
+                          ? "translateX(-50%) translateY(0)"
+                          : "translateX(-50%) translateY(-10px)",
+                        visibility: isHovered ? "visible" : "hidden",
+                        zIndex: 10000,
+                      }}
+                    >
+                      <div
+                        className="relative overflow-hidden"
+                        style={{
+                          minWidth: "240px",
+                          padding: "16px 20px",
+                          borderRadius: "12px",
+                          backdropFilter: "blur(20px)",
+                          WebkitBackdropFilter: "blur(20px)",
+                          backgroundColor: isDayMode
+                            ? "rgba(255, 255, 255, 0.95)"
+                            : "rgba(15, 15, 26, 0.95)",
+                          border: isDayMode
+                            ? "1px solid rgba(255, 255, 255, 0.5)"
+                            : "1px solid rgba(255, 255, 255, 0.1)",
+                          boxShadow: isDayMode
+                            ? "0 10px 30px -5px rgba(0, 0, 0, 0.2)"
+                            : "0 10px 30px -5px rgba(0, 0, 0, 0.6)",
+                        }}
+                      >
+                        {/* Arrow */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-6px",
+                            left: "50%",
+                            width: "12px",
+                            height: "12px",
+                            backgroundColor: isDayMode
+                              ? "rgba(255, 255, 255, 0.95)"
+                              : "rgba(15, 15, 26, 0.95)",
+                            borderTop: isDayMode
+                              ? "1px solid rgba(255, 255, 255, 0.5)"
+                              : "1px solid rgba(255, 255, 255, 0.1)",
+                            borderLeft: isDayMode
+                              ? "1px solid rgba(255, 255, 255, 0.5)"
+                              : "1px solid rgba(255, 255, 255, 0.1)",
+                            transform: "translateX(-50%) rotate(45deg)",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "relative",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                            gap: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <div
+                              style={{
+                                color: isDayMode ? "#6b7280" : "#9ca3af",
+                              }}
+                            >
+                              {link.icon}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: 600,
+                                color: isDayMode ? "#111827" : "#f9fafb",
+                              }}
+                            >
+                              {link.label}
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              color: isDayMode ? "#374151" : "#d1d5db",
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            {link.text}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Right: Enhanced Toggle */}
           <div className="flex items-center gap-3">

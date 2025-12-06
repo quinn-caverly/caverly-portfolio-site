@@ -59,7 +59,7 @@ export function FallbackView({
             }}
           >
             {isMobile
-              ? "📱 Mobile View"
+              ? "🚧 Oops, you're using a mobile device"
               : "🚧 Oops! Content Blocked by Firewall"}
           </h2>
           <p
