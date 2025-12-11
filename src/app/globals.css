@@ -27,10 +27,13 @@
     }
 }
 
+html,
 body {
-    background: var(--background);
+    background: var(--f1-dark);
     color: var(--foreground);
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .f1-button {
