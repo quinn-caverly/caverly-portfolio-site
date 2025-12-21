@@ -40,7 +40,7 @@ const projectInfo: Record<
     emoji: "🎮",
     description: "Mods for YouTube (Java)",
     longDescription:
-      "Created custom Minecraft mods in Java for YouTube videos averaging 20,000+ views. Features custom entities, gameplay mechanics, and data systems.",
+      "Created custom Minecraft mods in Java for YouTube videos averaging 30,000+ views. Features custom entities, gameplay mechanics, and data systems.",
     image: "/images/knavishmantis/minecraft-mods.png",
   },
   BlueLakeOutpost: {

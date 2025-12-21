@@ -22,7 +22,7 @@ export const PROJECTS: Record<string, ProjectData> = {
     name: "BlueCapital",
     title: "Mods for YouTube",
     description:
-      "Created custom Minecraft mods in Java for YouTube videos averaging 20,000+ views. Applied OOP and design patterns to build custom entities, gameplay mechanics, and data systems.",
+      "Created custom Minecraft mods in Java for YouTube videos averaging 30,000+ views. Applied OOP and design patterns to build custom entities, gameplay mechanics, and data systems.",
     techStack: ["Java", "Object-Oriented Design"],
     emoji: "🎮",
     image: "/images/knavishmantis/minecraft-mods.png",
@@ -30,8 +30,8 @@ export const PROJECTS: Record<string, ProjectData> = {
     githubUrl: "https://github.com/orgs/knavishmantis/repositories",
     liveUrl: "https://www.youtube.com/@knavishmantis/shorts",
     youtubeVideos: [
-      "https://www.youtube.com/embed/KKKAMrBoQw4",
-      "https://www.youtube.com/embed/hOBiq9WKg7Q",
+      "https://www.youtube.com/embed/jvI3U4HGJtY",
+      "https://www.youtube.com/embed/leN2eQIzvkA",
     ],
     youtubeStats: "250K+ Monthly Views",
     analyticsImage: "/images/knavishmantis/knavishmantis-analytics.png",
